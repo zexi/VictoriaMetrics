@@ -4,6 +4,7 @@ import (
 	"bufio"
 	"compress/gzip"
 	"context"
+	"crypto/tls"
 	"errors"
 	"fmt"
 	"io"
@@ -281,6 +282,19 @@ func (im *Importer) flush(ctx context.Context, b []*TimeSeries) error {
 	return nil
 }
 
+func (im *Importer) getHTTPClient() *http.Client {
+	tr := &http.Transport{
+		TLSClientConfig: &tls.Config{InsecureSkipVerify: true},
+	}
+	var client *http.Client
+	if strings.HasPrefix(im.addr, "https") {
+		client = &http.Client{Transport: tr}
+	} else {
+		client = http.DefaultClient
+	}
+	return client
+}
+
 // Ping sends a ping to im.addr.
 func (im *Importer) Ping() error {
 	url := fmt.Sprintf("%s/health", im.addr)
@@ -291,7 +305,7 @@ func (im *Importer) Ping() error {
 	if im.user != "" {
 		req.SetBasicAuth(im.user, im.password)
 	}
-	resp, err := http.DefaultClient.Do(req)
+	resp, err := im.getHTTPClient().Do(req)
 	if err != nil {
 		return err
 	}
@@ -321,7 +335,7 @@ func (im *Importer) Import(tsBatch []*TimeSeries) error {
 
 	errCh := make(chan error)
 	go func() {
-		errCh <- do(req)
+		errCh <- do(im.getHTTPClient(), req)
 		close(errCh)
 	}()
 
@@ -375,8 +389,8 @@ func (im *Importer) Import(tsBatch []*TimeSeries) error {
 // ErrBadRequest represents bad request error.
 var ErrBadRequest = errors.New("bad request")
 
-func do(req *http.Request) error {
-	resp, err := http.DefaultClient.Do(req)
+func do(client *http.Client, req *http.Request) error {
+	resp, err := client.Do(req)
 	if err != nil {
 		return fmt.Errorf("unexpected error when performing request: %s", err)
 	}
