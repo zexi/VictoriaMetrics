@@ -109,7 +109,7 @@ func requestHandler(w http.ResponseWriter, r *http.Request) bool {
 		fmt.Fprintf(w, "<h2>Single-node VictoriaMetrics</h2></br>")
 		fmt.Fprintf(w, "See docs at <a href='https://docs.victoriametrics.com/'>https://docs.victoriametrics.com/</a></br>")
 		fmt.Fprintf(w, "Useful endpoints:</br>")
-		httpserver.WriteAPIHelp(w, [][2]string{
+		/*httpserver.WriteAPIHelp(w, [][2]string{
 			{"vmui", "Web UI"},
 			{"targets", "status for discovered active targets"},
 			{"service-discovery", "labels before and after relabeling for discovered targets"},
@@ -122,6 +122,9 @@ func requestHandler(w http.ResponseWriter, r *http.Request) bool {
 			{"api/v1/status/tsdb", "tsdb status page"},
 			{"api/v1/status/top_queries", "top queries"},
 			{"api/v1/status/active_queries", "active queries"},
+		})*/
+		httpserver.WriteAPIHelp(w, [][2]string{
+			{"", ""},
 		})
 		return true
 	}

@@ -172,7 +172,7 @@ func RequestHandler(w http.ResponseWriter, r *http.Request) bool {
 	}
 
 	// vmui access.
-	if path == "/vmui" || path == "/graph" {
+	/*if path == "/vmui" || path == "/graph" {
 		// VMUI access via incomplete url without `/` in the end. Redirect to complete url.
 		// Use relative redirect, since the hostname and path prefix may be incorrect if VictoriaMetrics
 		// is hidden behind vmauth or similar proxy.
@@ -203,7 +203,7 @@ func RequestHandler(w http.ResponseWriter, r *http.Request) bool {
 		r.URL.Path = path
 		vmuiFileServer.ServeHTTP(w, r)
 		return true
-	}
+	}*/
 
 	if strings.HasPrefix(path, "/api/v1/label/") {
 		s := path[len("/api/v1/label/"):]
