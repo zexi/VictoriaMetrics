@@ -20,6 +20,10 @@ include dashboards/Makefile
 include snap/local/Makefile
 include package/release/Makefile
 
+noui-img:
+	docker buildx build --platform linux/arm64,linux/amd64 --push \
+		-t registry.cn-beijing.aliyuncs.com/yunionio/victoria-metrics:v1.95.1-noui.0 -f ./Dockerfile .
+
 all: \
 	victoria-metrics-prod \
 	victoria-logs-prod \
