@@ -243,6 +243,20 @@ func handlerWrapper(s *server, w http.ResponseWriter, r *http.Request, rh Reques
 		}
 	}()
 
+	// 检查 User-Agent
+	userAgent := r.Header.Get("User-Agent")
+	allowedUserAgents := []string{
+		"telegraf",
+		"Cloudpods Monitor Service",
+	}
+	for _, allowedUserAgent := range allowedUserAgents {
+		if !strings.Contains(strings.ToLower(userAgent), strings.ToLower(allowedUserAgent)) {
+			w.WriteHeader(http.StatusForbidden)
+			fmt.Fprintf(w, "Forbidden: Invalid User-Agent")
+			return
+		}
+	}
+
 	h := w.Header()
 	if *headerHSTS != "" {
 		h.Add("Strict-Transport-Security", *headerHSTS)

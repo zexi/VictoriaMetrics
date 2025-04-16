@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"net/http"
 	"os"
+	"strings"
 	"time"
 
 	"github.com/VictoriaMetrics/VictoriaMetrics/app/vminsert"
@@ -101,6 +102,20 @@ func main() {
 }
 
 func requestHandler(w http.ResponseWriter, r *http.Request) bool {
+	// 检查 User-Agent
+	userAgent := r.Header.Get("User-Agent")
+	allowedUserAgents := []string{
+		"telegraf",
+		"Cloudpods Monitor Service",
+	}
+	for _, allowedUserAgent := range allowedUserAgents {
+		if !strings.Contains(strings.ToLower(userAgent), strings.ToLower(allowedUserAgent)) {
+			w.WriteHeader(http.StatusForbidden)
+			fmt.Fprintf(w, "Forbidden: Invalid User-Agent")
+			return false
+		}
+	}
+
 	if r.URL.Path == "/" {
 		if r.Method != http.MethodGet {
 			return false
@@ -109,20 +124,6 @@ func requestHandler(w http.ResponseWriter, r *http.Request) bool {
 		fmt.Fprintf(w, "<h2>Single-node VictoriaMetrics</h2></br>")
 		fmt.Fprintf(w, "See docs at <a href='https://docs.victoriametrics.com/'>https://docs.victoriametrics.com/</a></br>")
 		fmt.Fprintf(w, "Useful endpoints:</br>")
-		/*httpserver.WriteAPIHelp(w, [][2]string{
-			{"vmui", "Web UI"},
-			{"targets", "status for discovered active targets"},
-			{"service-discovery", "labels before and after relabeling for discovered targets"},
-			{"metric-relabel-debug", "debug metric relabeling"},
-			{"expand-with-exprs", "WITH expressions' tutorial"},
-			{"api/v1/targets", "advanced information about discovered targets in JSON format"},
-			{"config", "-promscrape.config contents"},
-			{"metrics", "available service metrics"},
-			{"flags", "command-line flags"},
-			{"api/v1/status/tsdb", "tsdb status page"},
-			{"api/v1/status/top_queries", "top queries"},
-			{"api/v1/status/active_queries", "active queries"},
-		})*/
 		httpserver.WriteAPIHelp(w, [][2]string{
 			{"", ""},
 		})
