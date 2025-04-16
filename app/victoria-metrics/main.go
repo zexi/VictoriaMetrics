@@ -5,7 +5,6 @@ import (
 	"fmt"
 	"net/http"
 	"os"
-	"strings"
 	"time"
 
 	"github.com/VictoriaMetrics/VictoriaMetrics/app/vminsert"
@@ -102,20 +101,6 @@ func main() {
 }
 
 func requestHandler(w http.ResponseWriter, r *http.Request) bool {
-	// 检查 User-Agent
-	userAgent := r.Header.Get("User-Agent")
-	allowedUserAgents := []string{
-		"telegraf",
-		"Cloudpods Monitor Service",
-	}
-	for _, allowedUserAgent := range allowedUserAgents {
-		if !strings.Contains(strings.ToLower(userAgent), strings.ToLower(allowedUserAgent)) {
-			w.WriteHeader(http.StatusForbidden)
-			fmt.Fprintf(w, "Forbidden: Invalid User-Agent")
-			return false
-		}
-	}
-
 	if r.URL.Path == "/" {
 		if r.Method != http.MethodGet {
 			return false
