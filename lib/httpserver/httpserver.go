@@ -249,6 +249,7 @@ func handlerWrapper(s *server, w http.ResponseWriter, r *http.Request, rh Reques
 		"kube-probe/",
 		"telegraf",
 		"Cloudpods Monitor Service",
+		"yunioncloud-go",
 	}
 	shouldPass := false
 	for _, allowedUserAgent := range allowedUserAgents {
